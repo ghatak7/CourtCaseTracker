@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register</title>
+<link rel="stylesheet" href="style.css">
+<script>
+       function sendOTP() {
+           const phone = document.getElementById('phone').value;
+           if (!phone) {
+               alert("Please enter a valid phone number.");
+               return;
+           }
+           fetch('/send-otp', {
+               method: 'POST',
+               headers: {
+                   'Content-Type': 'application/json',
+               },
+               body: JSON.stringify({ phone }),
+           })
+           .then(response => response.json())
+           .then(data => {
+               if (data.success) {
+                   alert("OTP sent successfully!");
+                   document.getElementById('otp-section').style.display = 'block';
+               } else {
+                   alert("Error sending OTP: " + data.message);
+               }
+           });
+       }
+       function validateCaptcha() {
+           const captcha = document.getElementById('captcha').value;
+           if (!captcha) {
+               alert("Please enter the CAPTCHA.");
+               return false;
+           }
+           return true;
+       }
+</script>
+</head>
+<body>
+<h1>Registration Page</h1>
+<form method="POST" action="/register" onsubmit="return validateCaptcha()">
+<label for="first_name">First Name:</label>
+<input type="text" id="first_name" name="first_name" required>
+<label for="last_name">Last Name:</label>
+<input type="text" id="last_name" name="last_name" required>
+<label for="email">Email:</label>
+<input type="email" id="email" name="email" required>
+<label for="phone">Phone Number:</label>
+<input type="text" id="phone" name="phone" required>
+<button type="button" onclick="sendOTP()">Send OTP</button>
+<div id="otp-section" style="display: none;">
+<label for="otp">Enter OTP:</label>
+<input type="text" id="otp" name="otp" required>
+</div>
+<label for="captcha">CAPTCHA:</label>
+<img src="/generate-captcha" alt="CAPTCHA" id="captcha-img">
+<input type="text" id="captcha" name="captcha" required>
+<button type="button" onclick="document.getElementById('captcha-img').src = '/generate-captcha?' + Date.now();">Refresh CAPTCHA</button>
+<button type="submit">Register</button>
+</form>
+</body>
+</html>
+
+
